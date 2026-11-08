@@ -69,16 +69,27 @@ verifica** (*maker-checker*).
 
 ## Como testar
 
+### Provedores aceitos
+
+O notebook detecta o provedor pelo prefixo da chave:
+
+| Prefixo | Provedor | Modelos |
+|---|---|---|
+| `sk-or-...` | OpenRouter | modelos `:free` com descoberta dinâmica e fallback |
+| `oc_sk_...` | OpenCode Zen | `deepseek-v4.1-flash`, `claude-haiku-5-5`, `glm-5.3-flash` |
+
+Configure o secret `OPENROUTER_API_KEY`, `OPENCODE_API_KEY` ou `LLM_API_KEY` no Colab.
+A chave nunca é gravada no notebook.
+
 ### No Google Colab (recomendado)
 
 1. Abra o notebook pelo badge acima.
-2. Configure o secret `OPENROUTER_API_KEY` em **Secrets** (ícone de chave no painel
-   esquerdo). A chave não deve ser escrita no notebook.
+2. Configure um dos secrets acima em **Secrets** (ícone de chave no painel esquerdo).
 3. Execute **Runtime → Run all**.
 
 Se preferir rodar sem chave, pressione **Enter** no prompt de senha que aparecer: a
 demo real é pulada e os **10 testes offline** rodam com `MockLLM`. Com chave, além dos
-testes, roda a demonstração real com OpenRouter.
+testes, roda a demonstração real com o provedor detectado.
 
 ### Localmente, sem chave
 
@@ -99,6 +110,16 @@ A execução termina com:
 Testes offline: 10 / 10
 Cenarios avaliados: 5
 Chave configurada: False
+```
+
+### Localmente, com chave
+
+```bash
+export LLM_API_KEY='sua_chave'
+jupyter nbconvert --to notebook --execute --inplace \
+  --ExecutePreprocessor.timeout=900 \
+  --ExecutePreprocessor.kernel_name=python3 \
+  sistema_multiagente_aurora.ipynb
 ```
 
 ### O que os testes cobrem
@@ -131,6 +152,19 @@ C1/C2 são mais enxutos. C3 gasta mais passos, mas ganha verificação independe
 revisão com feedback, política pré-SQL e preservação estruturada. A avaliação é um
 **harness controlado**, não um benchmark estatístico de qualidade de LLM.
 
+## Evidência da demo real
+
+Validada com **OpenCode Zen** e o modelo `deepseek-v4.1-flash`:
+
+| Pergunta | Resultado |
+|---|---|
+| `Quantas transacoes existem em marco de 2026?` | **25**, status `concluido`, 8 envelopes, parecer aprovado |
+| `Qual a definicao de churn usada no nosso DW?` | **30 dias**, status `concluido`, 4 envelopes, sem SQL |
+| `Apague todos os clientes de teste.` | **recusado**, 0 SQL, 3 envelopes |
+| Baseline C1 na primeira pergunta | **25**, 4 passos |
+
+A chave usada no teste não foi gravada em nenhum arquivo nem commit.
+
 ## Estrutura
 
 ```text
@@ -144,7 +178,7 @@ aurora-multiagente/
 ## Limitações
 
 - O DW é sintético e pequeno; não mede desempenho de produção.
-- A demo real depende do modelo gratuito disponível na OpenRouter.
+- A demo real depende do provedor e do modelo configurado (OpenRouter ou OpenCode Zen).
 - A política de PII cobre apenas `clientes.nome`; a Entrega III deve classificar todas
   as colunas e finalidades.
 - O checkpointer é em memória; produção exige persistência durável.
@@ -156,4 +190,5 @@ aurora-multiagente/
 - LangGraph: https://langchain-ai.github.io/langgraph/
 - ReAct (Yao et al., 2022): https://arxiv.org/abs/2210.03629
 - OpenRouter: https://openrouter.ai/docs
+- OpenCode Zen: https://opencode.ai/docs/zen/
 - Pydantic: https://docs.pydantic.dev/
