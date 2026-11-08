@@ -76,8 +76,9 @@ verifica** (*maker-checker*).
    esquerdo). A chave não deve ser escrita no notebook.
 3. Execute **Runtime → Run all**.
 
-Sem chave, a demo com LLM real é pulada automaticamente e os **10 testes offline**
-rodam com `MockLLM`. Com chave, além dos testes, roda a demonstração real com OpenRouter.
+Se preferir rodar sem chave, pressione **Enter** no prompt de senha que aparecer: a
+demo real é pulada e os **10 testes offline** rodam com `MockLLM`. Com chave, além dos
+testes, roda a demonstração real com OpenRouter.
 
 ### Localmente, sem chave
 
